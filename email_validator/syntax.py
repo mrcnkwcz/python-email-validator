@@ -71,14 +71,14 @@ def validate_email_local_part(local: str, allow_smtputf8: bool = True, allow_emp
     if len(local) == 0:
         if not allow_empty_local:
             raise EmailSyntaxError("There must be something before the @-sign.")
-        else:
-            # The caller allows an empty local part. Useful for validating certain
-            # Postfix aliases.
-            return {
-                "local_part": local,
-                "ascii_local_part": local,
-                "smtputf8": False,
-            }
+
+        # The caller allows an empty local part. Useful for validating certain
+        # Postfix aliases.
+        return {
+            "local_part": local,
+            "ascii_local_part": local,
+            "smtputf8": False,
+        }
 
     # Check the length of the local part by counting characters.
     # (RFC 5321 4.5.3.1.1)
