@@ -26,7 +26,6 @@ def split_email(email):
         # Since backslash-escaping is no longer needed because
         # the quotes are removed, remove backslash-escaping
         # to return in the normalized form.
-        import re
         local_part = re.sub(r"\\(.)", "\\1", local_part)
 
         return local_part, domain_part, True
