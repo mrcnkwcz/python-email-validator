@@ -190,8 +190,8 @@ def validate_email_local_part(local: str, allow_smtputf8: bool = True, allow_emp
         # want to have an unhandled exception later.
         try:
             local.encode("utf8")
-        except ValueError:
-            raise EmailSyntaxError("The email address contains an invalid character.")
+        except ValueError as e:
+            raise EmailSyntaxError("The email address contains an invalid character.") from e
 
         # If this address passes only by the quoted string form, re-quote it
         # and backslash-escape quotes and backslashes (removing any unnecessary
@@ -329,7 +329,7 @@ def validate_email_domain_name(domain, test_environment=False, globally_delivera
     try:
         domain = idna.uts46_remap(domain, std3_rules=False, transitional=False)
     except idna.IDNAError as e:
-        raise EmailSyntaxError(f"The part after the @-sign contains invalid characters ({e}).")
+        raise EmailSyntaxError(f"The part after the @-sign contains invalid characters ({e}).") from e
 
     # The domain part is made up dot-separated "labels." Each label must
     # have at least one character and cannot start or end with dashes, which
@@ -373,11 +373,11 @@ def validate_email_domain_name(domain, test_environment=False, globally_delivera
                 # the length check is applied to a string that is different from the
                 # one the user supplied. Also I'm not sure if the length check applies
                 # to the internationalized form, the IDNA ASCII form, or even both!
-                raise EmailSyntaxError("The email address is too long after the @-sign.")
+                raise EmailSyntaxError("The email address is too long after the @-sign.") from e
 
             # Other errors seem to not be possible because the call to idna.uts46_remap
             # would have already raised them.
-            raise EmailSyntaxError(f"The part after the @-sign contains invalid characters ({e}).")
+            raise EmailSyntaxError(f"The part after the @-sign contains invalid characters ({e}).") from e
 
         # Check the syntax of the string returned by idna.encode.
         # It should never fail.
@@ -439,7 +439,7 @@ def validate_email_domain_name(domain, test_environment=False, globally_delivera
     try:
         domain_i18n = idna.decode(ascii_domain.encode('ascii'))
     except idna.IDNAError as e:
-        raise EmailSyntaxError(f"The part after the @-sign is not valid IDNA ({e}).")
+        raise EmailSyntaxError(f"The part after the @-sign is not valid IDNA ({e}).") from e
 
     # Check for invalid characters after normalization. These
     # should never arise. See the similar checks above.
@@ -517,7 +517,7 @@ def validate_email_domain_literal(domain_literal):
         try:
             addr = ipaddress.IPv4Address(domain_literal)
         except ValueError as e:
-            raise EmailSyntaxError(f"The address in brackets after the @-sign is not valid: It is not an IPv4 address ({e}) or is missing an address literal tag.")
+            raise EmailSyntaxError(f"The address in brackets after the @-sign is not valid: It is not an IPv4 address ({e}) or is missing an address literal tag.") from e
 
         # Return the IPv4Address object and the domain back unchanged.
         return {
@@ -530,7 +530,7 @@ def validate_email_domain_literal(domain_literal):
         try:
             addr = ipaddress.IPv6Address(domain_literal[5:])
         except ValueError as e:
-            raise EmailSyntaxError(f"The IPv6 address in brackets after the @-sign is not valid ({e}).")
+            raise EmailSyntaxError(f"The IPv6 address in brackets after the @-sign is not valid ({e}).") from e
 
         # Return the IPv6Address object and construct a normalized
         # domain literal.
