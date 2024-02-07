@@ -96,10 +96,10 @@ def validate_email_deliverability(domain: str, domain_i18n: str, timeout: Option
                 # No TXT records means there is no SPF policy, so we cannot take any action.
                 pass
 
-    except dns.resolver.NXDOMAIN:
+    except dns.resolver.NXDOMAIN as e:
         # The domain name does not exist --- there are no records of any sort
         # for the domain name.
-        raise EmailUndeliverableError(f"The domain name {domain_i18n} does not exist.")
+        raise EmailUndeliverableError(f"The domain name {domain_i18n} does not exist.") from e
 
     except dns.resolver.NoNameservers:
         # All nameservers failed to answer the query. This might be a problem
@@ -122,6 +122,6 @@ def validate_email_deliverability(domain: str, domain_i18n: str, timeout: Option
         # Unhandled conditions should not propagate.
         raise EmailUndeliverableError(
             "There was an error while checking if the domain name in the email address is deliverable: " + str(e)
-        )
+        ) from e
 
     return deliverability_info
